@@ -253,6 +253,11 @@
       color:#fff;
     }
 
+    .btn-green{
+      background:var(--green);
+      color:#fff;
+    }
+
     .btn-red{
       background:#fee2e2;
       color:#b91c1c;
@@ -280,6 +285,7 @@
       font-size:13px;
       color:var(--muted);
       margin-top:8px;
+      line-height:1.8;
     }
 
     .search-wrap{
@@ -435,10 +441,10 @@
           <div>
             <h3>المميزات ✨</h3>
             <ul>
-              <li>رفع ملف صوت من الجوال أو التسجيل الخارجي</li>
+              <li>تسجيل صوت مباشر إن دعمه الجهاز</li>
+              <li>رفع ملف صوت كخطة بديلة</li>
               <li>حفظ الرسائل والأصوات محليًا</li>
-              <li>حذف الرسالة كاملة أو حذف الصوت فقط</li>
-              <li>تمييز واضح بين المعلم/ة وولي الأمر</li>
+              <li>حذف الرسالة أو حذف الصوت فقط</li>
             </ul>
           </div>
           <div style="font-size:38px">⚡</div>
@@ -499,13 +505,23 @@
           </div>
 
           <div id="audioWrap" class="record-box" style="display:none">
-            <label>اختيار ملف صوتي</label>
-            <input type="file" id="audioFile" accept="audio/*">
-            <div class="record-status" id="recordStatus">لم يتم اختيار ملف صوتي بعد</div>
-            <audio id="audioPreview" controls style="display:none"></audio>
+            <label>الصوت</label>
 
             <div class="actions">
+              <button class="btn btn-green" type="button" onclick="startRecording()">🎤 بدء التسجيل</button>
+              <button class="btn btn-red" type="button" onclick="stopRecording()">⏹️ إيقاف التسجيل</button>
               <button class="btn btn-gray" type="button" onclick="clearCurrentAudio()">🗑️ حذف الصوت الحالي</button>
+            </div>
+
+            <div class="record-status" id="recordStatus">
+              إذا لم يعمل التسجيل على الآيفون، استخدمي رفع ملف صوت في الأسفل.
+            </div>
+
+            <audio id="audioPreview" controls style="display:none"></audio>
+
+            <div style="margin-top:12px">
+              <label>أو ارفعي ملف صوت</label>
+              <input type="file" id="audioFile" accept="audio/*">
             </div>
           </div>
 
@@ -551,11 +567,15 @@
   <div class="footer-status" id="footerStatus">جاهز</div>
 
   <script>
-    const STORAGE_KEY = "parents_platform_upload_audio_only_v1";
+    const STORAGE_KEY = "parents_platform_final_record_upload_v1";
 
     let appData = loadData();
     let senderType = "teacher";
     let currentAudioData = null;
+    let mediaRecorder = null;
+    let currentStream = null;
+    let chunks = [];
+    let isRecording = false;
 
     function el(id){ return document.getElementById(id); }
 
@@ -629,13 +649,110 @@
 
     function clearCurrentAudio(){
       currentAudioData = null;
+      chunks = [];
       el("audioFile").value = "";
+
       const audio = el("audioPreview");
       audio.pause();
       audio.removeAttribute("src");
       audio.load();
       audio.style.display = "none";
+
+      if(currentStream){
+        currentStream.getTracks().forEach(track => track.stop());
+        currentStream = null;
+      }
+
+      isRecording = false;
       el("recordStatus").textContent = "تم حذف الصوت الحالي";
+    }
+
+    function blobToDataURL(blob){
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    async function startRecording(){
+      try{
+        if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+          alert("التسجيل غير مدعوم، استخدمي رفع ملف صوت");
+          return;
+        }
+
+        if(typeof MediaRecorder === "undefined"){
+          alert("التسجيل غير مدعوم في هذا المتصفح، استخدمي رفع ملف صوت");
+          return;
+        }
+
+        clearCurrentAudio();
+
+        currentStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        chunks = [];
+
+        let options = {};
+        if (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported("audio/webm")) {
+          options.mimeType = "audio/webm";
+        }
+
+        mediaRecorder = new MediaRecorder(currentStream, options);
+
+        mediaRecorder.ondataavailable = (e) => {
+          if(e.data && e.data.size > 0){
+            chunks.push(e.data);
+          }
+        };
+
+        mediaRecorder.onstart = () => {
+          isRecording = true;
+          el("recordStatus").textContent = "جاري التسجيل الآن...";
+        };
+
+        mediaRecorder.onerror = () => {
+          isRecording = false;
+          el("recordStatus").textContent = "حدث خطأ في التسجيل. استخدمي رفع ملف صوت.";
+        };
+
+        mediaRecorder.onstop = async () => {
+          isRecording = false;
+
+          if(currentStream){
+            currentStream.getTracks().forEach(track => track.stop());
+            currentStream = null;
+          }
+
+          if(!chunks.length){
+            el("recordStatus").textContent = "لم يتم حفظ أي صوت. استخدمي رفع ملف صوت.";
+            return;
+          }
+
+          const blob = new Blob(chunks, { type: "audio/webm" });
+          currentAudioData = await blobToDataURL(blob);
+
+          const audio = el("audioPreview");
+          audio.src = currentAudioData;
+          audio.style.display = "block";
+          el("recordStatus").textContent = "تم التسجيل بنجاح";
+        };
+
+        mediaRecorder.start();
+      } catch(err){
+        isRecording = false;
+        el("recordStatus").textContent = "تعذر تشغيل الميكروفون. استخدمي رفع ملف صوت.";
+        alert("إذا لم يعمل التسجيل على الآيفون، استخدمي رفع ملف صوت من الجوال");
+      }
+    }
+
+    function stopRecording(){
+      if(!mediaRecorder || !isRecording){
+        alert("لا يوجد تسجيل يعمل الآن");
+        return;
+      }
+
+      mediaRecorder.stop();
     }
 
     el("audioFile").addEventListener("change", function(e){
@@ -681,7 +798,7 @@
         }
       }else{
         if(!currentAudioData){
-          alert("اختاري ملف صوت أولًا");
+          alert("سجلي صوت أو ارفعي ملف صوت أولًا");
           return;
         }
         audioData = currentAudioData;
