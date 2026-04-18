@@ -1,931 +1,132 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>منصة أولياء الأمور</title>
-  <style>
-    :root{
-      --nav:#081133;
-      --nav2:#0c1a4a;
-      --bg:#eef2f7;
-      --card:#ffffff;
-      --line:#e5e7eb;
-      --purple:#7c3aed;
-      --purple2:#9333ea;
-      --green:#059669;
-      --orange:#f59e0b;
-      --red:#ef4444;
-      --text:#111827;
-      --muted:#6b7280;
-    }
+<meta charset="UTF-8">
+<title>منصة أولياء الأمور</title>
 
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:Tajawal, Tahoma, Arial, sans-serif;
-      background:var(--bg);
-      color:var(--text);
-    }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    .layout{
-      display:grid;
-      grid-template-columns:250px 1fr;
-      min-height:100vh;
-    }
-
-    .sidebar{
-      background:linear-gradient(180deg,var(--nav),var(--nav2));
-      color:#fff;
-      padding:22px 16px;
-    }
-
-    .brand{
-      text-align:center;
-      margin-bottom:24px;
-    }
-
-    .brand h1{
-      margin:0;
-      font-size:28px;
-      font-weight:1000;
-    }
-
-    .brand p{
-      margin:8px 0 0;
-      font-size:12px;
-      color:#c7d2fe;
-    }
-
-    .nav-btn{
-      width:100%;
-      background:transparent;
-      color:#fff;
-      border:none;
-      text-align:right;
-      padding:14px 16px;
-      border-radius:14px;
-      margin-bottom:8px;
-      cursor:pointer;
-      font-weight:900;
-      font-size:15px;
-    }
-
-    .nav-btn.active,
-    .nav-btn:hover{
-      background:rgba(255,255,255,.08);
-    }
-
-    .save-box{
-      margin-top:18px;
-      background:rgba(34,197,94,.12);
-      border:1px solid rgba(34,197,94,.25);
-      color:#bbf7d0;
-      border-radius:14px;
-      padding:10px 12px;
-      font-size:12px;
-      text-align:center;
-    }
-
-    .main{
-      padding:24px;
-    }
-
-    .page{display:none}
-    .page.active{display:block}
-
-    .hero{
-      text-align:center;
-      margin-bottom:18px;
-    }
-
-    .hero h2{
-      margin:0;
-      font-size:42px;
-      color:#111b44;
-      font-weight:1000;
-    }
-
-    .hero p{
-      margin:8px 0 0;
-      color:var(--muted);
-    }
-
-    .stats{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:14px;
-      margin-bottom:18px;
-    }
-
-    .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:20px;
-      padding:18px;
-      box-shadow:0 8px 22px rgba(0,0,0,.04);
-    }
-
-    .stat{
-      text-align:center;
-    }
-
-    .stat .icon{
-      width:52px;
-      height:52px;
-      border-radius:16px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      margin:0 auto 10px;
-      font-size:24px;
-      background:#f3e8ff;
-      color:var(--purple);
-    }
-
-    .stat .label{
-      color:var(--muted);
-      font-size:14px;
-    }
-
-    .stat .value{
-      font-size:34px;
-      font-weight:1000;
-      margin-top:6px;
-    }
-
-    .feature-box{
-      display:flex;
-      justify-content:space-between;
-      gap:16px;
-      align-items:flex-start;
-    }
-
-    .feature-box h3{
-      margin:0 0 10px;
-      font-size:26px;
-    }
-
-    .feature-box ul{
-      margin:0;
-      padding-right:18px;
-      color:var(--muted);
-      line-height:2;
-    }
-
-    .section-title{
-      text-align:center;
-      font-size:38px;
-      font-weight:1000;
-      margin:0 0 18px;
-      color:#111b44;
-    }
-
-    .sender-row{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-      margin-bottom:14px;
-    }
-
-    .sender-btn{
-      border:2px solid #e5e7eb;
-      background:#fff;
-      color:#374151;
-      border-radius:14px;
-      padding:14px;
-      font-weight:900;
-      cursor:pointer;
-    }
-
-    .sender-btn.active{
-      border-color:var(--purple);
-      background:#faf5ff;
-      color:var(--purple);
-    }
-
-    .grid2{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-    }
-
-    label{
-      display:block;
-      font-size:13px;
-      font-weight:800;
-      margin:0 0 7px;
-      color:#374151;
-    }
-
-    input, select, textarea{
-      width:100%;
-      border:1px solid var(--line);
-      background:#fff;
-      border-radius:14px;
-      padding:13px 14px;
-      font-size:14px;
-      outline:none;
-    }
-
-    textarea{
-      min-height:120px;
-      resize:vertical;
-    }
-
-    .actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:12px;
-    }
-
-    .btn{
-      border:none;
-      border-radius:14px;
-      padding:13px 18px;
-      font-weight:900;
-      cursor:pointer;
-    }
-
-    .btn-primary{
-      background:linear-gradient(90deg,var(--purple2),var(--purple));
-      color:#fff;
-    }
-
-    .btn-green{
-      background:var(--green);
-      color:#fff;
-    }
-
-    .btn-red{
-      background:#fee2e2;
-      color:#b91c1c;
-    }
-
-    .btn-orange{
-      background:#fef3c7;
-      color:#92400e;
-    }
-
-    .btn-gray{
-      background:#f3f4f6;
-      color:#374151;
-    }
-
-    .record-box{
-      margin-top:14px;
-      padding:14px;
-      border:1px dashed #d8dbe8;
-      border-radius:16px;
-      background:#fafbff;
-    }
-
-    .record-status{
-      font-size:13px;
-      color:var(--muted);
-      margin-top:8px;
-    }
-
-    .search-wrap{
-      max-width:300px;
-      margin-bottom:16px;
-    }
-
-    .messages-list{
-      display:flex;
-      flex-direction:column;
-      gap:14px;
-    }
-
-    .message-card{
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:16px;
-      box-shadow:0 8px 18px rgba(0,0,0,.03);
-    }
-
-    .message-top{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-bottom:10px;
-    }
-
-    .meta{
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.9;
-    }
-
-    .badges{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
-
-    .badge{
-      padding:5px 10px;
-      border-radius:999px;
-      font-size:12px;
-      font-weight:900;
-    }
-
-    .badge.teacher{background:#ede9fe;color:#6d28d9}
-    .badge.parent{background:#dbeafe;color:#1d4ed8}
-    .badge.text{background:#fef3c7;color:#92400e}
-    .badge.audio{background:#fce7f3;color:#be185d}
-    .badge.normal{background:#ecfeff;color:#0f766e}
-    .badge.urgent{background:#fee2e2;color:#b91c1c}
-
-    .message-body{
-      white-space:pre-wrap;
-      line-height:1.9;
-      margin-top:8px;
-    }
-
-    audio{
-      width:100%;
-      margin-top:12px;
-    }
-
-    .settings-box{
-      max-width:700px;
-      margin:0 auto;
-    }
-
-    .danger-zone{
-      margin-top:18px;
-      padding-top:18px;
-      border-top:1px solid #eee;
-    }
-
-    .empty{
-      text-align:center;
-      color:var(--muted);
-      padding:28px 10px;
-    }
-
-    .footer-status{
-      position:fixed;
-      left:18px;
-      bottom:18px;
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:9px 12px;
-      font-size:12px;
-      box-shadow:0 8px 20px rgba(0,0,0,.05);
-      z-index:99;
-    }
-
-    @media(max-width:980px){
-      .layout{grid-template-columns:1fr}
-      .stats{grid-template-columns:repeat(2,1fr)}
-      .grid2{grid-template-columns:1fr}
-      .hero h2,.section-title{font-size:30px}
-    }
-  </style>
+<style>
+body{font-family:tajawal;background:#0f172a;color:#fff;padding:20px}
+input,select,textarea{width:100%;padding:10px;margin:5px 0;border-radius:10px}
+button{padding:10px;border:none;border-radius:10px;margin:5px;cursor:pointer}
+.send{background:#7c3aed;color:#fff}
+.record{background:#059669;color:#fff}
+.card{background:#fff;color:#000;padding:15px;margin:10px;border-radius:15px}
+.del{background:red;color:#fff}
+</style>
 </head>
+
 <body>
-  <div class="layout">
-    <aside class="sidebar">
-      <div class="brand">
-        <h1 id="brandName">منصة أولياء الأمور</h1>
-        <p>إرسال الرسائل والتسجيلات الصوتية ✨</p>
-      </div>
-
-      <button class="nav-btn active" onclick="showPage('home', this)">الرئيسية</button>
-      <button class="nav-btn" onclick="showPage('add', this)">إضافة رسالة</button>
-      <button class="nav-btn" onclick="showPage('messages', this)">الرسائل والصوتيات</button>
-      <button class="nav-btn" onclick="showPage('settings', this)">الإعدادات</button>
-
-      <div class="save-box">الحفظ المحلي الدائم مفعل</div>
-    </aside>
-
-    <main class="main">
-      <section id="page-home" class="page active">
-        <div class="hero">
-          <h2 id="homeTitle">منصة أولياء الأمور</h2>
-          <p>منصة مطوّرة للرسائل النصية والصوتية بين المعلمين وأولياء الأمور</p>
-        </div>
-
-        <div class="stats">
-          <div class="card stat">
-            <div class="icon">✅</div>
-            <div class="label">حالة النظام</div>
-            <div class="value" style="color:#16a34a">فعال</div>
-          </div>
-          <div class="card stat">
-            <div class="icon">👥</div>
-            <div class="label">أصوات أولياء الأمور</div>
-            <div class="value" id="statParentAudio">0</div>
-          </div>
-          <div class="card stat">
-            <div class="icon">🎤</div>
-            <div class="label">رسائل صوتية</div>
-            <div class="value" id="statAudio">0</div>
-          </div>
-          <div class="card stat">
-            <div class="icon">💬</div>
-            <div class="label">إجمالي الرسائل</div>
-            <div class="value" id="statTotal">0</div>
-          </div>
-        </div>
-
-        <div class="card feature-box">
-          <div>
-            <h3>المميزات ✨</h3>
-            <ul>
-              <li>تسجيل صوت مباشر إذا كان المتصفح يدعم ذلك</li>
-              <li>رفع ملف صوت بديل إذا فشل التسجيل</li>
-              <li>حفظ الرسائل والأصوات محليًا</li>
-              <li>حذف الرسالة أو حذف الصوت فقط</li>
-            </ul>
-          </div>
-          <div style="font-size:38px">⚡</div>
-        </div>
-      </section>
-
-      <section id="page-add" class="page">
-        <h2 class="section-title">إضافة رسالة جديدة 🎙️</h2>
-
-        <div class="card">
-          <div class="sender-row">
-            <button id="senderParentBtn" class="sender-btn" type="button" onclick="setSender('parent')">من ولي الأمر 👥</button>
-            <button id="senderTeacherBtn" class="sender-btn active" type="button" onclick="setSender('teacher')">من المعلم/ة 📱</button>
-          </div>
-
-          <div class="grid2">
-            <div>
-              <label id="senderLabel">اسم المعلم/ة</label>
-              <input id="senderName" placeholder="مثال: منال محمد">
-            </div>
-            <div>
-              <label>اسم الطالب</label>
-              <input id="studentName" placeholder="مثال: نوف محمد أحمد">
-            </div>
-          </div>
-
-          <div class="grid2" style="margin-top:12px">
-            <div>
-              <label>الصف</label>
-              <input id="className" placeholder="مثال: ثاني ثانوي">
-            </div>
-            <div>
-              <label>المادة</label>
-              <input id="subjectName" placeholder="مثال: التوحيد">
-            </div>
-          </div>
-
-          <div class="grid2" style="margin-top:12px">
-            <div>
-              <label>درجة الأهمية</label>
-              <select id="importance">
-                <option value="عادي">عادي</option>
-                <option value="عاجل">عاجل</option>
-              </select>
-            </div>
-            <div>
-              <label>نوع الرسالة</label>
-              <select id="messageType" onchange="toggleMessageType()">
-                <option value="text">نصية 📝</option>
-                <option value="audio">صوتية 🎙️</option>
-              </select>
-            </div>
-          </div>
-
-          <div id="textWrap" style="margin-top:12px">
-            <label>الرسالة</label>
-            <textarea id="messageText" placeholder="اكتب رسالتك هنا..."></textarea>
-          </div>
-
-          <div id="audioWrap" class="record-box" style="display:none">
-            <label>صوت الرسالة</label>
-
-            <div class="actions">
-              <button class="btn btn-green" type="button" onclick="startRecording()">🎤 بدء التسجيل</button>
-              <button class="btn btn-red" type="button" onclick="stopRecording()">⏹️ إيقاف التسجيل</button>
-              <button class="btn btn-gray" type="button" onclick="clearCurrentAudio()">🗑️ حذف الصوت الحالي</button>
-            </div>
-
-            <div class="record-status" id="recordStatus">لم يتم تسجيل أو اختيار صوت بعد</div>
-
-            <audio id="audioPreview" controls style="display:none"></audio>
-
-            <div style="margin-top:12px">
-              <label>أو ارفعي ملف صوت</label>
-              <input type="file" id="audioFile" accept="audio/*">
-            </div>
-          </div>
-
-          <div class="actions">
-            <button class="btn btn-primary" type="button" onclick="saveMessage()">إرسال الرسالة ✈️</button>
-          </div>
-        </div>
-      </section>
-
-      <section id="page-messages" class="page">
-        <h2 class="section-title">الرسائل والصوتيات ✉️</h2>
-
-        <div class="search-wrap">
-          <input id="searchInput" placeholder="ابحث عن رسالة..." oninput="renderMessages()">
-        </div>
-
-        <div id="messagesList" class="messages-list"></div>
-      </section>
-
-      <section id="page-settings" class="page">
-        <h2 class="section-title">الإعدادات ⚙️</h2>
-
-        <div class="card settings-box">
-          <label>اسم المنصة</label>
-          <input id="platformName" placeholder="منصة أولياء الأمور">
-
-          <div class="actions">
-            <button class="btn btn-primary" type="button" onclick="savePlatformName()">حفظ التغييرات</button>
-          </div>
-
-          <div class="danger-zone">
-            <div style="font-weight:1000;color:#b91c1c;margin-bottom:6px">منطقة الخطر ⚠️</div>
-            <div style="color:#6b7280;font-size:13px">حذف جميع الرسائل والأصوات نهائيًا</div>
-            <div class="actions">
-              <button class="btn btn-red" type="button" onclick="deleteAllMessages()">حذف جميع الرسائل</button>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
-  </div>
-
-  <div class="footer-status" id="footerStatus">جاهز</div>
-
-  <script>
-    const STORAGE_KEY = "parents_platform_advanced_v1";
-
-    let appData = loadData();
-    let senderType = "teacher";
-    let mediaRecorder = null;
-    let recordedChunks = [];
-    let currentStream = null;
-    let currentAudioData = null;
-
-    function el(id){ return document.getElementById(id); }
-
-    function defaultData(){
-      return {
-        platformName: "منصة أولياء الأمور",
-        messages: []
-      };
-    }
-
-    function loadData(){
-      try{
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if(!raw) return defaultData();
-        return Object.assign(defaultData(), JSON.parse(raw));
-      }catch(e){
-        return defaultData();
-      }
-    }
-
-    function saveData(statusText = "تم الحفظ"){
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
-      el("footerStatus").textContent = statusText;
-      renderAll();
-    }
-
-    function showPage(page, btn){
-      document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-      document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-      el("page-" + page).classList.add("active");
-      if(btn) btn.classList.add("active");
-      if(page === "messages") renderMessages();
-    }
-
-    function setSender(type){
-      senderType = type;
-      el("senderTeacherBtn").classList.toggle("active", type === "teacher");
-      el("senderParentBtn").classList.toggle("active", type === "parent");
-
-      const label = el("senderLabel");
-      const input = el("senderName");
-
-      if(type === "teacher"){
-        label.textContent = "اسم المعلم/ة";
-        input.placeholder = "مثال: منال محمد";
-      }else{
-        label.textContent = "اسم ولي الأمر";
-        input.placeholder = "مثال: والد الطالب / والدة الطالب";
-      }
-    }
-
-    function toggleMessageType(){
-      const type = el("messageType").value;
-      el("textWrap").style.display = type === "text" ? "block" : "none";
-      el("audioWrap").style.display = type === "audio" ? "block" : "block";
-      if(type === "text"){
-        el("audioWrap").style.display = "none";
-      }
-    }
-
-    function savePlatformName(){
-      const name = el("platformName").value.trim() || "منصة أولياء الأمور";
-      appData.platformName = name;
-      saveData("تم حفظ اسم المنصة");
-    }
-
-    function updatePlatformNameUI(){
-      const name = appData.platformName || "منصة أولياء الأمور";
-      el("brandName").textContent = name;
-      el("homeTitle").textContent = name;
-      el("platformName").value = name;
-      document.title = name;
-    }
-
-    function clearCurrentAudio(showText = true){
-      currentAudioData = null;
-      recordedChunks = [];
-      el("audioFile").value = "";
-
-      const audio = el("audioPreview");
-      audio.pause();
-      audio.removeAttribute("src");
-      audio.load();
-      audio.style.display = "none";
-
-      if(currentStream){
-        currentStream.getTracks().forEach(track => track.stop());
-        currentStream = null;
-      }
-
-      if(showText){
-        el("recordStatus").textContent = "تم حذف الصوت الحالي";
-      }
-    }
-
-    function dataURLFromBlob(blob){
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-    }
-
-    async function startRecording(){
-      try{
-        if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-          alert("التسجيل غير مدعوم، استخدمي رفع ملف صوت");
-          return;
-        }
-
-        clearCurrentAudio(false);
-
-        currentStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        recordedChunks = [];
-
-        mediaRecorder = new MediaRecorder(currentStream);
-
-        mediaRecorder.ondataavailable = (e) => {
-          if(e.data && e.data.size > 0){
-            recordedChunks.push(e.data);
-          }
-        };
-
-        mediaRecorder.onstart = () => {
-          el("recordStatus").textContent = "جاري التسجيل الآن...";
-        };
-
-        mediaRecorder.onerror = () => {
-          el("recordStatus").textContent = "حدث خطأ أثناء التسجيل، استخدمي رفع ملف صوت";
-        };
-
-        mediaRecorder.start();
-      }catch(err){
-        el("recordStatus").textContent = "تعذر تشغيل الميكروفون، استخدمي رفع ملف صوت";
-        alert("إذا لم يعمل التسجيل، استخدمي رفع ملف صوت أسفل نفس الصندوق");
-      }
-    }
-
-    async function stopRecording(){
-      if(!mediaRecorder || mediaRecorder.state !== "recording"){
-        alert("لا يوجد تسجيل يعمل الآن");
-        return;
-      }
-
-      mediaRecorder.onstop = async () => {
-        if(currentStream){
-          currentStream.getTracks().forEach(track => track.stop());
-          currentStream = null;
-        }
-
-        if(!recordedChunks.length){
-          el("recordStatus").textContent = "لم يتم حفظ أي صوت";
-          return;
-        }
-
-        const blob = new Blob(recordedChunks, { type: "audio/webm" });
-        currentAudioData = await dataURLFromBlob(blob);
-
-        const audio = el("audioPreview");
-        audio.src = currentAudioData;
-        audio.style.display = "block";
-        el("recordStatus").textContent = "تم التسجيل بنجاح";
-      };
-
-      mediaRecorder.stop();
-    }
-
-    el("audioFile").addEventListener("change", function(e){
-      const file = e.target.files[0];
-      if(!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(){
-        currentAudioData = reader.result;
-        const audio = el("audioPreview");
-        audio.src = currentAudioData;
-        audio.style.display = "block";
-        el("recordStatus").textContent = "تم اختيار ملف صوتي بنجاح";
-      };
-      reader.readAsDataURL(file);
-    });
-
-    async function saveMessage(){
-      const senderName = el("senderName").value.trim();
-      const studentName = el("studentName").value.trim();
-      const className = el("className").value.trim();
-      const subjectName = el("subjectName").value.trim();
-      const importance = el("importance").value;
-      const messageType = el("messageType").value;
-      const messageText = el("messageText").value.trim();
-
-      if(!studentName){
-        alert("اكتبي اسم الطالب");
-        return;
-      }
-
-      if(!senderName){
-        alert(senderType === "teacher" ? "اكتبي اسم المعلم/ة" : "اكتبي اسم ولي الأمر");
-        return;
-      }
-
-      let audioData = null;
-
-      if(messageType === "text"){
-        if(!messageText){
-          alert("اكتبي الرسالة النصية");
-          return;
-        }
-      }else{
-        if(!currentAudioData){
-          alert("سجلي صوت أو ارفعي ملف صوت أولًا");
-          return;
-        }
-        audioData = currentAudioData;
-      }
-
-      appData.messages.unshift({
-        id: Date.now() + Math.random(),
-        senderType,
-        senderName,
-        studentName,
-        className,
-        subjectName,
-        importance,
-        messageType,
-        messageText: messageType === "text" ? messageText : "",
-        audioData: messageType === "audio" ? audioData : "",
-        createdAt: new Date().toLocaleString("ar-SA")
-      });
-
-      el("senderName").value = "";
-      el("studentName").value = "";
-      el("className").value = "";
-      el("subjectName").value = "";
-      el("messageText").value = "";
-      el("importance").value = "عادي";
-      el("messageType").value = "text";
-      toggleMessageType();
-      clearCurrentAudio(false);
-      el("recordStatus").textContent = "لم يتم تسجيل أو اختيار صوت بعد";
-      setSender(senderType);
-
-      saveData("تم حفظ الرسالة بنجاح");
-      showPage("messages", document.querySelectorAll(".nav-btn")[2]);
-    }
-
-    function deleteMessage(id){
-      if(!confirm("هل تريدين حذف هذه الرسالة؟")) return;
-      appData.messages = appData.messages.filter(m => m.id !== id);
-      saveData("تم حذف الرسالة");
-    }
-
-    function deleteAudio(id){
-      const msg = appData.messages.find(m => m.id === id);
-      if(!msg) return;
-      if(!confirm("هل تريدين حذف الصوت فقط؟")) return;
-
-      msg.audioData = "";
-      msg.messageType = "text";
-      msg.messageText = msg.messageText || "(تم حذف الصوت)";
-      saveData("تم حذف الصوت فقط");
-    }
-
-    function deleteAllMessages(){
-      if(!confirm("هل تريدين حذف جميع الرسائل والأصوات؟")) return;
-      appData.messages = [];
-      saveData("تم حذف جميع الرسائل");
-    }
-
-    function renderStats(){
-      const total = appData.messages.length;
-      const audioCount = appData.messages.filter(m => m.messageType === "audio").length;
-      const parentAudio = appData.messages.filter(m => m.messageType === "audio" && m.senderType === "parent").length;
-
-      el("statTotal").textContent = total;
-      el("statAudio").textContent = audioCount;
-      el("statParentAudio").textContent = parentAudio;
-    }
-
-    function escapeHtml(text){
-      return String(text || "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-
-    function renderMessages(){
-      const box = el("messagesList");
-      const q = (el("searchInput").value || "").trim().toLowerCase();
-
-      const filtered = appData.messages.filter(m => {
-        const hay = [
-          m.senderName,
-          m.studentName,
-          m.className,
-          m.subjectName,
-          m.messageText,
-          m.senderType === "teacher" ? "معلم" : "ولي أمر"
-        ].join(" ").toLowerCase();
-
-        return hay.includes(q);
-      });
-
-      if(!filtered.length){
-        box.innerHTML = `<div class="card empty">لا توجد رسائل</div>`;
-        return;
-      }
-
-      box.innerHTML = filtered.map(m => `
-        <div class="message-card">
-          <div class="message-top">
-            <div class="meta">
-              <div><strong>${escapeHtml(m.senderName)}</strong></div>
-              <div>الطالب: ${escapeHtml(m.studentName)}</div>
-              <div>الصف: ${escapeHtml(m.className || "-")}</div>
-              <div>المادة: ${escapeHtml(m.subjectName || "-")}</div>
-              <div>التاريخ: ${escapeHtml(m.createdAt)}</div>
-            </div>
-
-            <div class="badges">
-              <span class="badge ${m.senderType === "teacher" ? "teacher" : "parent"}">
-                ${m.senderType === "teacher" ? "من المعلم/ة" : "من ولي الأمر"}
-              </span>
-              <span class="badge ${m.messageType === "text" ? "text" : "audio"}">
-                ${m.messageType === "text" ? "نصية" : "صوتية"}
-              </span>
-              <span class="badge ${m.importance === "عاجل" ? "urgent" : "normal"}">
-                ${escapeHtml(m.importance)}
-              </span>
-              <button class="btn btn-red" type="button" onclick="deleteMessage(${m.id})">حذف الرسالة</button>
-              ${m.messageType === "audio" ? `<button class="btn btn-orange" type="button" onclick="deleteAudio(${m.id})">حذف الصوت فقط</button>` : ""}
-            </div>
-          </div>
-
-          ${m.messageType === "text"
-            ? `<div class="message-body">${escapeHtml(m.messageText)}</div>`
-            : `<audio controls src="${m.audioData}"></audio>`
-          }
-        </div>
-      `).join("");
-    }
-
-    function renderAll(){
-      updatePlatformNameUI();
-      renderStats();
-      renderMessages();
-    }
-
-    setSender("teacher");
-    toggleMessageType();
-    renderAll();
-  </script>
+
+<h2>📩 منصة أولياء الأمور</h2>
+
+<select id="sender">
+<option value="المعلم">من المعلم</option>
+<option value="ولي الأمر">من ولي الأمر</option>
+</select>
+
+<input id="student" placeholder="اسم الطالب">
+<input id="class" placeholder="الصف">
+<input id="subject" placeholder="المادة">
+
+<textarea id="message" placeholder="اكتب الرسالة..."></textarea>
+
+<button class="send" onclick="sendMessage()">إرسال</button>
+
+<hr>
+
+<button class="record" onclick="startRec()">🎤 تسجيل</button>
+<button onclick="stopRec()">⏹ إيقاف</button>
+
+<hr>
+
+<h3>📬 الرسائل</h3>
+<div id="messages"></div>
+
+<script>
+
+// 🔴 غيري هذه القيم فقط
+const supabaseUrl = "PUT_URL_HERE";
+const supabaseKey = "PUT_KEY_HERE";
+
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+let recorder;
+let audioBlob = null;
+
+async function startRec(){
+  const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+  recorder = new MediaRecorder(stream);
+
+  let chunks = [];
+
+  recorder.ondataavailable = e => chunks.push(e.data);
+
+  recorder.onstop = ()=>{
+    audioBlob = new Blob(chunks,{type:"audio/webm"});
+  };
+
+  recorder.start();
+}
+
+function stopRec(){
+  recorder.stop();
+}
+
+async function uploadAudio(){
+  if(!audioBlob) return null;
+
+  const fileName = Date.now()+".webm";
+
+  await supabase.storage.from("audio").upload(fileName,audioBlob);
+
+  const { data } = supabase.storage.from("audio").getPublicUrl(fileName);
+
+  return data.publicUrl;
+}
+
+async function sendMessage(){
+
+  const audioUrl = await uploadAudio();
+
+  await supabase.from("messages").insert([{
+    sender: sender.value,
+    student: student.value,
+    class: document.getElementById("class").value,
+    subject: subject.value,
+    message: message.value,
+    audio: audioUrl
+  }]);
+
+  loadMessages();
+}
+
+async function loadMessages(){
+
+  const { data } = await supabase
+  .from("messages")
+  .select("*")
+  .order("created_at",{ascending:false});
+
+  messages.innerHTML="";
+
+  data.forEach(m=>{
+    messages.innerHTML+=`
+    <div class="card">
+    <b>${m.sender}</b><br>
+    ${m.student} - ${m.class}<br>
+    ${m.subject}<br>
+    ${m.message || ""}<br>
+    ${m.audio ? `<audio controls src="${m.audio}"></audio>` : ""}
+    </div>
+    `;
+  });
+}
+
+loadMessages();
+
+</script>
+
 </body>
 </html>
